@@ -1,0 +1,43 @@
+%{
+/* Definitions section: C code and declarations */
+#include <stdio.h>
+int match_count = 0;  // Counter for A* matches
+%}
+
+/* Define A* regular expression pattern */
+ASTAR_PATTERN   (a*|a+)
+
+%%
+{ASTAR_PATTERN} {
+    printf("Match found: %s\n", yytext);
+    match_count++;
+}
+
+.               { /* Ignore other characters */ }
+\n              { /* Ignore newlines */ }
+
+%%
+
+/* Main function */
+int main(int argc, char **argv) {
+    // If a file is provided as an argument, use it
+    if (argc > 1) {
+        if (!(yyin = fopen(argv[1], "r"))) {
+            perror(argv[1]);
+            return 1;
+        }
+    }
+    
+    // Run lexical analysis
+    yylex();
+    
+    // Print total matches
+    printf("Total A* matches: %d\n", match_count);
+    
+    return 0;
+}
+
+// Required when using lex/flex
+int yywrap() {
+    return 1;
+}
